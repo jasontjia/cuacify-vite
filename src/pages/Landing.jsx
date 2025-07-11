@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import bgImage from './assets/weatherapp.jpg';
+import bgImage from '../assets/weatherapp.png';
 
 function Landing() {
   const navigate = useNavigate();
