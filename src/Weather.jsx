@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import bgImage from './assets/weatherapp.png';
+const bgImage = '/weatherapp.jpg';
 
 // Komponen modular
 import ThemeToggle from './components/ThemeToggle';
