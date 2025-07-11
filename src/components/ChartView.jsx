@@ -1,4 +1,24 @@
 import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LineController,
+  CategoryScale,  // <== penting
+  LinearScale,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  LineElement,
+  PointElement,
+  LineController,
+  CategoryScale,  // <== ini yang error kamu minta
+  LinearScale,
+  Tooltip,
+  Legend
+);
 
 const ChartView = ({ forecast, theme }) => {
   if (!forecast || forecast.length === 0) return null;
