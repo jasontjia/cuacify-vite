@@ -4,20 +4,23 @@ import {
   LineElement,
   PointElement,
   LineController,
-  CategoryScale,  // <== penting
+  CategoryScale,
   LinearScale,
   Tooltip,
   Legend,
+  Title,
 } from 'chart.js';
 
+// Registrasi komponen Chart.js
 ChartJS.register(
   LineElement,
   PointElement,
   LineController,
-  CategoryScale,  // <== ini yang error kamu minta
+  CategoryScale,
   LinearScale,
   Tooltip,
-  Legend
+  Legend,
+  Title
 );
 
 const ChartView = ({ forecast, theme }) => {
@@ -25,42 +28,58 @@ const ChartView = ({ forecast, theme }) => {
 
   const chartData = {
     labels: forecast.map((item) =>
-      new Date(item.dt_txt).toLocaleDateString()
+      new Date(item.dt_txt).toLocaleDateString('id-ID', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+      })
     ),
     datasets: [
       {
-        label: 'Suhu Harian',
+        label: 'Suhu Harian (°C)',
         data: forecast.map((item) => item.main.temp),
-        borderColor: 'rgb(59,130,246)',
-        backgroundColor: 'rgb(59,130,246)',
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59,130,246,0.2)',
         tension: 0.4,
+        fill: true,
       },
     ],
   };
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         labels: {
-          color: theme === 'dark' ? 'white' : 'black',
+          color: theme === 'dark' ? '#fff' : '#000',
         },
       },
       title: {
         display: true,
-        text: 'Grafik Suhu Harian',
-        color: theme === 'dark' ? 'white' : 'black',
+        text: '📈 Grafik Suhu Harian',
+        color: theme === 'dark' ? '#fff' : '#000',
+        font: {
+          size: 16,
+        },
       },
     },
     scales: {
       x: {
+        type: 'category',
         ticks: {
-          color: theme === 'dark' ? 'white' : 'black',
+          color: theme === 'dark' ? '#fff' : '#000',
+        },
+        grid: {
+          color: theme === 'dark' ? '#444' : '#ccc',
         },
       },
       y: {
         ticks: {
-          color: theme === 'dark' ? 'white' : 'black',
+          color: theme === 'dark' ? '#fff' : '#000',
+        },
+        grid: {
+          color: theme === 'dark' ? '#444' : '#ccc',
         },
       },
     },
@@ -69,7 +88,7 @@ const ChartView = ({ forecast, theme }) => {
   return (
     <div className="mt-6">
       <h3 className="text-lg font-semibold mb-3">📊 Grafik Suhu</h3>
-      <div className="bg-white/40 p-4 rounded-xl shadow-md">
+      <div className="bg-white/40 dark:bg-black/40 p-4 rounded-xl shadow-md h-64">
         <Line data={chartData} options={chartOptions} />
       </div>
     </div>
