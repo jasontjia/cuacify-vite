@@ -151,11 +151,11 @@ function Weather() {
         </div>
       )}
 
-      <div className="w-full max-w-xl bg-blue-300 backdrop-blur-md p-6 rounded-xl shadow-xl">
+      <div className="w-full max-w-xl bg-white/30 backdrop-blur-xl p-6 rounded-xl shadow-xl">
         <div className="flex justify-between items-center mb-3">
           <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
           {localTime && (
-            <span className="text-sm font-bold text-black dark:text-white">
+            <span className="text-sm font-bold text-black">
               🕒 {localTime} (lokal)
             </span>
           )}

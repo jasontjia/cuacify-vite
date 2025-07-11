@@ -5,7 +5,7 @@ const Footer = () => {
 
   return (
     <div className="mt-6 flex justify-between items-center">
-      <p className="text-sm text-gray-800 dark:text-gray-300 font-medium">
+      <p className="text-sm text-gray-800 font-bold">
         Dibuat oleh <span className="font-semibold">JasonXie</span> © {new Date().getFullYear()}
       </p>
       <button

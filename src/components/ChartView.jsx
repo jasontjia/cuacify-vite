@@ -88,7 +88,7 @@ const ChartView = ({ forecast, theme }) => {
   return (
     <div className="mt-6">
       <h3 className="text-lg font-semibold mb-3">📊 Grafik Suhu</h3>
-      <div className="bg-white/40 dark:bg-black/40 p-4 rounded-xl shadow-md h-64">
+      <div className="bg-blue/60 p-4 rounded-xl shadow-md h-64">
         <Line data={chartData} options={chartOptions} />
       </div>
     </div>
