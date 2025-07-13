@@ -9,9 +9,10 @@ import {
   Tooltip,
   Legend,
   Title,
+  Filler, // ✅ Penting untuk fitur `fill`
 } from 'chart.js';
 
-// Registrasi komponen Chart.js
+// Registrasi semua plugin Chart.js
 ChartJS.register(
   LineElement,
   PointElement,
@@ -20,7 +21,8 @@ ChartJS.register(
   LinearScale,
   Tooltip,
   Legend,
-  Title
+  Title,
+  Filler // ✅ Tambahkan agar background chart bisa terisi
 );
 
 const ChartView = ({ forecast, theme }) => {
@@ -39,7 +41,7 @@ const ChartView = ({ forecast, theme }) => {
         label: 'Suhu Harian (°C)',
         data: forecast.map((item) => item.main.temp),
         borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59,130,246,0.2)',
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
         tension: 0.4,
         fill: true,
       },
@@ -52,13 +54,13 @@ const ChartView = ({ forecast, theme }) => {
     plugins: {
       legend: {
         labels: {
-          color: theme === 'dark' ? '#fff' : '#000',
+          color: theme === 'dark' ? '#ffffff' : '#000000',
         },
       },
       title: {
         display: true,
         text: '📈 Grafik Suhu Harian',
-        color: theme === 'dark' ? '#fff' : '#000',
+        color: theme === 'dark' ? '#ffffff' : '#000000',
         font: {
           size: 16,
         },
@@ -68,7 +70,7 @@ const ChartView = ({ forecast, theme }) => {
       x: {
         type: 'category',
         ticks: {
-          color: theme === 'dark' ? '#fff' : '#000',
+          color: theme === 'dark' ? '#ffffff' : '#000000',
         },
         grid: {
           color: theme === 'dark' ? '#444' : '#ccc',
@@ -76,7 +78,7 @@ const ChartView = ({ forecast, theme }) => {
       },
       y: {
         ticks: {
-          color: theme === 'dark' ? '#fff' : '#000',
+          color: theme === 'dark' ? '#ffffff' : '#000000',
         },
         grid: {
           color: theme === 'dark' ? '#444' : '#ccc',
@@ -88,7 +90,7 @@ const ChartView = ({ forecast, theme }) => {
   return (
     <div className="mt-6">
       <h3 className="text-lg font-semibold mb-3">📊 Grafik Suhu</h3>
-      <div className="bg-blue/60 p-4 rounded-xl shadow-md h-64">
+      <div className="bg-white/30 dark:bg-white/10 p-4 rounded-xl shadow-md h-64">
         <Line data={chartData} options={chartOptions} />
       </div>
     </div>
