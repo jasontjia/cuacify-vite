@@ -9,7 +9,7 @@ const SearchBar = ({ setCity, handleSearch }) => {
   const [loadingCities, setLoadingCities] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Ambil daftar negara
+  // Ambil daftar negara saat pertama kali
   useEffect(() => {
     const cached = localStorage.getItem('cn_countries');
     if (cached) {
@@ -26,43 +26,31 @@ const SearchBar = ({ setCity, handleSearch }) => {
         setErrorMsg('');
       } catch (err) {
         console.error('Gagal mengambil negara:', err);
-        setErrorMsg('Gagal mengambil daftar negara. Silakan coba lagi.');
+        setErrorMsg('Gagal mengambil daftar negara.');
       }
     };
 
     fetchCountries();
   }, []);
 
-  // Ambil daftar kota dari negara
-  useEffect(() => {
-    if (!selectedCountry) {
-      setCities([]);
-      return;
+  // Ambil kota ketika tombol ditekan
+  const handleGetCities = async () => {
+    if (!selectedCountry) return;
+    setLoadingCities(true);
+    setCities([]);
+    try {
+      const res = await axios.post('https://countriesnow.space/api/v0.1/countries/cities', {
+        country: selectedCountry,
+      });
+      setCities(res.data.data);
+      setErrorMsg('');
+    } catch (err) {
+      console.error('Gagal mengambil kota:', err);
+      setErrorMsg('Negara tidak ditemukan. Pastikan penulisan sesuai daftar.');
+    } finally {
+      setLoadingCities(false);
     }
-
-    const fetchCities = async () => {
-      setLoadingCities(true);
-      try {
-        const res = await axios.post('https://countriesnow.space/api/v0.1/countries/cities', {
-          country: selectedCountry,
-        });
-        setCities(res.data.data);
-        setErrorMsg('');
-      } catch (err) {
-        console.error('Gagal mengambil kota:', err);
-        setErrorMsg('Gagal mengambil daftar kota.');
-      } finally {
-        setLoadingCities(false);
-      }
-    };
-
-    fetchCities();
-  }, [selectedCountry]);
-
-  // Reset error saat input berubah
-  useEffect(() => {
-    setErrorMsg('');
-  }, [selectedCountry, selectedCity]);
+  };
 
   const handleSubmit = () => {
     if (selectedCity) {
@@ -73,43 +61,54 @@ const SearchBar = ({ setCity, handleSearch }) => {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row gap-2 w-full mb-4">
-        {/* Dropdown Negara */}
-        <select
-          value={selectedCountry}
-          onChange={(e) => {
-            setSelectedCountry(e.target.value);
-            setSelectedCity('');
-            setCities([]);
-          }}
-          className="w-full sm:w-[35%] px-4 py-2 rounded-lg border text-black"
-        >
-          <option value="">Pilih Negara</option>
-          {countries.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4 w-full">
+        {/* Input Negara */}
+        <div className="w-full sm:w-[30%]">
+          <input
+            list="negara-list"
+            value={selectedCountry}
+            onChange={(e) => {
+              setSelectedCountry(e.target.value);
+              setSelectedCity('');
+              setCities([]);
+            }}
+            placeholder="Ketik atau pilih negara"
+            className="w-full px-4 py-2 rounded-lg border text-black"
+          />
+          <datalist id="negara-list">
+            {countries.map((name, i) => (
+              <option key={i} value={name} />
+            ))}
+          </datalist>
+        </div>
 
-        {/* Dropdown Kota */}
-        <select
-          value={selectedCity}
-          onChange={(e) => setSelectedCity(e.target.value)}
-          disabled={!selectedCountry || loadingCities}
-          className="w-full sm:w-[45%] px-4 py-2 rounded-lg border text-black"
+        {/* Tombol Ambil Kota */}
+        <button
+          onClick={handleGetCities}
+          disabled={!selectedCountry}
+          className="w-full sm:w-[20%] bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg disabled:opacity-50"
         >
-          <option value="">
-            {loadingCities ? 'Memuat kota...' : 'Pilih Kota'}
-          </option>
-          {cities.map((city, i) => (
-            <option key={i} value={city}>
-              {city}
-            </option>
-          ))}
-        </select>
+          Simpan
+        </button>
 
-        {/* Tombol */}
+        {/* Input Kota */}
+        <div className="w-full sm:w-[30%]">
+          <input
+            list="kota-list"
+            value={selectedCity}
+            onChange={(e) => setSelectedCity(e.target.value)}
+            placeholder={loadingCities ? 'Memuat kota...' : 'Ketik atau pilih kota'}
+            disabled={cities.length === 0}
+            className="w-full px-4 py-2 rounded-lg border text-black"
+          />
+          <datalist id="kota-list">
+            {cities.map((city, i) => (
+              <option key={i} value={city} />
+            ))}
+          </datalist>
+        </div>
+
+        {/* Tombol Cek */}
         <button
           onClick={handleSubmit}
           disabled={!selectedCity}
@@ -119,9 +118,8 @@ const SearchBar = ({ setCity, handleSearch }) => {
         </button>
       </div>
 
-      {errorMsg && (
-        <p className="text-red-600 text-sm mt-1">{errorMsg}</p>
-      )}
+      {/* Error Message */}
+      {errorMsg && <p className="text-red-600 text-sm mt-1">{errorMsg}</p>}
     </>
   );
 };
