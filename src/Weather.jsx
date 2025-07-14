@@ -1,8 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-const bgImage = '/weatherapp.jpg';
-
-// Komponen modular
 import ThemeToggle from './components/ThemeToggle';
 import SearchBar from './components/SearchBar';
 import WeatherCard from './components/WeatherCard';
@@ -11,6 +8,8 @@ import FavoriteList from './components/FavoriteList';
 import MapView from './components/MapView';
 import ChartView from './components/ChartView';
 import Footer from './components/Footer';
+
+const bgImage = '/weatherapp.jpg';
 
 function Weather() {
   const [city, setCity] = useState('');
@@ -25,12 +24,10 @@ function Weather() {
   const [localTime, setLocalTime] = useState('');
   const [showWelcome, setShowWelcome] = useState(true);
 
-  const API_KEY = '6129088de3e00d9c898f36844d92c770';
+  const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || '6129088de3e00d9c898f36844d92c770';
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowWelcome(false);
-    }, 3000);
+    const timer = setTimeout(() => setShowWelcome(false), 3000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -87,7 +84,7 @@ function Weather() {
     } finally {
       setLoading(false);
     }
-  }, [unit, saveToHistory]);
+  }, [unit, saveToHistory, API_KEY]);
 
   const handleSearch = (customCity = null) => {
     const target = customCity || city;
@@ -95,7 +92,6 @@ function Weather() {
     fetchWeatherData(target);
   };
 
-  // Lokasi otomatis saat awal
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(async ({ coords }) => {
       const { latitude, longitude } = coords;
@@ -123,14 +119,12 @@ function Weather() {
         setLoading(false);
       }
     });
-  }, [unit, saveToHistory]);
+  }, [unit, saveToHistory, API_KEY]);
 
-  // Auto-fetch jika unit berubah
   useEffect(() => {
     if (city) fetchWeatherData(city);
   }, [city, unit, fetchWeatherData]);
 
-  // Refresh tiap 5 menit
   useEffect(() => {
     const interval = setInterval(() => {
       if (city) fetchWeatherData(city);
@@ -161,7 +155,7 @@ function Weather() {
           )}
         </div>
 
-        <SearchBar city={city} setCity={setCity} handleSearch={handleSearch} />
+        <SearchBar setCity={setCity} handleSearch={handleSearch} />
         <FavoriteList favorites={favorites} handleSearch={handleSearch} />
 
         {history.length > 0 && (
