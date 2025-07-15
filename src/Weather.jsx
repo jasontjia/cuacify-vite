@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import ThemeToggle from './components/ThemeToggle';
 import SearchBar from './components/SearchBar';
 import WeatherCard from './components/WeatherCard';
@@ -57,6 +60,21 @@ function Weather() {
     localStorage.setItem('favorites', JSON.stringify(updated));
   };
 
+  // ✅ Deteksi cuaca ekstrem
+  const checkExtremeWeather = useCallback((temp, unit) => {
+    if ((unit === 'metric' && temp >= 35) || (unit === 'imperial' && temp >= 95)) {
+      toast.warning('⚠️ Suhu ekstrem terdeteksi!', {
+        position: 'top-center',
+        autoClose: 4000,
+      });
+    } else if ((unit === 'metric' && temp <= 5) || (unit === 'imperial' && temp <= 41)) {
+      toast.info('❄️ Suhu sangat dingin!', {
+        position: 'top-center',
+        autoClose: 4000,
+      });
+    }
+  }, []);
+
   const fetchWeatherData = useCallback(async (query) => {
     setLoading(true);
     try {
@@ -67,6 +85,9 @@ function Weather() {
       setCity(res.data.name);
       saveToHistory(res.data.name);
       setError('');
+
+      const temp = res.data.main.temp;
+      checkExtremeWeather(temp, unit); // ✅ panggil
 
       const timezoneOffset = res.data.timezone;
       const local = new Date(Date.now() + timezoneOffset * 1000);
@@ -84,7 +105,7 @@ function Weather() {
     } finally {
       setLoading(false);
     }
-  }, [unit, saveToHistory, API_KEY]);
+  }, [unit, saveToHistory, checkExtremeWeather, API_KEY]);
 
   const handleSearch = (customCity = null) => {
     const target = customCity || city;
@@ -104,6 +125,8 @@ function Weather() {
         setCity(res.data.name);
         saveToHistory(res.data.name);
 
+        checkExtremeWeather(res.data.main.temp, unit); // ✅ panggil
+
         const timezoneOffset = res.data.timezone;
         const local = new Date(Date.now() + timezoneOffset * 1000);
         setLocalTime(local.toUTCString().slice(17, 25));
@@ -119,7 +142,7 @@ function Weather() {
         setLoading(false);
       }
     });
-  }, [unit, saveToHistory, API_KEY]);
+  }, [unit, saveToHistory, checkExtremeWeather, API_KEY]);
 
   useEffect(() => {
     if (city) fetchWeatherData(city);
@@ -128,7 +151,7 @@ function Weather() {
   useEffect(() => {
     const interval = setInterval(() => {
       if (city) fetchWeatherData(city);
-    }, 300000); // 5 menit
+    }, 300000);
     return () => clearInterval(interval);
   }, [city, unit, fetchWeatherData]);
 
